@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import health
+from routers import health, exif
 
 #create an instance of FastAPI and customize metadata configurations
 app = FastAPI(
@@ -23,3 +23,5 @@ app = FastAPI(
 
 #include the health router in the FastAPI application
 app.include_router(health.router)
+#include the exif router in the FastAPI application
+app.include_router(exif.router)
