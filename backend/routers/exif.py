@@ -2,6 +2,7 @@ from fastapi import APIRouter, status, HTTPException, UploadFile
 from models.exif import Exif
 from uuid import uuid4
 from core.image_processing import open_image, read_exif
+from core.validator import validate_file
 
 #create an instance of APIRouter
 router = APIRouter(
@@ -10,19 +11,11 @@ router = APIRouter(
 
 #directory path to store images
 IMG_DIR = 'img/'
-#list of MIME types supported by Exif
-mime_type = ['image/jpeg', 'image/png', 'image/tiff', 'image/webp']
-#maximum file size in bytes that can be uploaded
-FILE_SIZE = 26214400 #25MB (1MB = 1,048,576 Bytes)
 
 @router.post('/view', response_model=Exif, status_code=status.HTTP_200_OK)
 async def view_exif(file: UploadFile):
-    #check if the file's content type is supported
-    if file.content_type not in mime_type:
-        raise HTTPException(status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-    #check if the file size exceeds the maximum allowed size
-    if len(await file.read()) >= FILE_SIZE:
-        raise HTTPException(status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE)
+    #ensure file's content type and size meet the specified requirements
+    await validate_file(file)
     #extract the file extension
     extension = file.filename.split('.')[-1]
     #generate a unique filename using UUID and the original file extension
