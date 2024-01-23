@@ -1,5 +1,15 @@
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
 from routers import health, exif
+from core.validator import validate_dir
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    #on startup
+    #check if directory exists else create one
+    validate_dir()
+    yield
+    #on shutdown
 
 #create an instance of FastAPI and customize metadata configurations
 app = FastAPI(
@@ -18,7 +28,8 @@ app = FastAPI(
         license_info={ #set the license information for the API
             'name': 'MIT License',
             'url': 'https://raw.githubusercontent.com/antenehbedilu/exif/main/LICENSE'
-            }
+            },
+        lifespan=lifespan #run events on starts up and shutting down
         )
 
 #include the health router in the FastAPI application
