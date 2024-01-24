@@ -1,6 +1,13 @@
 from PIL import Image
 from PIL.ExifTags import TAGS
 from datetime import datetime
+from uuid import uuid4
+
+def generate_filename(file):
+    #extract the file extension
+    extension = file.filename.split('.')[-1]
+    #generate a unique filename using UUID and the original file extension
+    file.filename = f'{str(uuid4())}.{extension}'
 
 def open_image(img: str):
     #opens an image using the provided file path 
