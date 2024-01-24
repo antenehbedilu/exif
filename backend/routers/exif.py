@@ -1,7 +1,6 @@
 from fastapi import APIRouter, status, HTTPException, UploadFile
 from models.exif import Exif
-from uuid import uuid4
-from core.image_processing import open_image, read_exif
+from core.image_processing import open_image, read_exif, generate_filename
 from core.validator import validate_file
 
 #create an instance of APIRouter
@@ -16,10 +15,8 @@ IMG_DIR = 'img/'
 async def view_exif(file: UploadFile):
     #ensure file's content type and size meet the specified requirements
     await validate_file(file)
-    #extract the file extension
-    extension = file.filename.split('.')[-1]
-    #generate a unique filename using UUID and the original file extension
-    file.filename = f'{str(uuid4())}.{extension}'
+    #generate a unique file name
+    generate_filename(file)
     #put the file pointer at the start of the file, so that the next read will read the same content again
     await file.seek(0)
     #read the image data
