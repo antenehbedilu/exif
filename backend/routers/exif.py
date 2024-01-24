@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status, HTTPException, UploadFile
 from models.exif import Exif
-from core.image_processing import open_image, read_exif, generate_filename
+from core.image_processing import open_image, read_exif, generate_filename, save_image
 from core.validator import validate_file
 
 #create an instance of APIRouter
@@ -19,11 +19,8 @@ async def view_exif(file: UploadFile):
     generate_filename(file)
     #put the file pointer at the start of the file, so that the next read will read the same content again
     await file.seek(0)
-    #read the image data
-    image = await file.read()
-    #save the image to the specified directory
-    with open(f'{IMG_DIR}{file.filename}', 'wb') as f:
-        f.write(image)
+    #save uploaded image
+    await save_image(file)
     #open the saved image
     image = open_image(f'{IMG_DIR}{file.filename}')
     #read the Exif data from the image
